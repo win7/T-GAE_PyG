@@ -3,6 +3,9 @@
 This repository includes a modified implementation of [T-GAE](https://github.com/Jason-Tree/T-GAE/tree/main) that uses
 [PyTorch Geometric (PyG)](https://pytorch-geometric.readthedocs.io/).
 
+- Python: 3.10
+- PyTorch Geometric: 2.7.0
+
 # T-GAE: Transferable Graph Autoencoder for Network Alignment
 
 This repository contains code for the paper T-GAE: Transferable Graph Autoencoder for Network Alignment. The paper is accepted by Proceedings of the Third Learning on Graphs Conference (LoG 2024)
