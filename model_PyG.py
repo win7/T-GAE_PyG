@@ -10,7 +10,6 @@ import torch.nn.functional as F
 from torch import nn
 from torch_geometric.nn import GINConv, global_mean_pool
 
-print("Using TG")
 # Encoder usando GINConv de torch_geometric
 class TGAE_Encoder(torch.nn.Module):
 	def __init__(self, input_dim, hidden_dim, output_dim, n_layers):

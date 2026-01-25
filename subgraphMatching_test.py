@@ -10,63 +10,70 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
     best_hitAtTen = 0
     best_hitAtFifty = 0
     optimizer = Adam(GAE.parameters(), lr=lr,weight_decay=5e-4)
-    for step in tqdm(range(epoch)):
+    
+    loop_obj = tqdm(range(1, epoch + 1))
+    for step in loop_obj:
+        loop_obj.set_description(f"Epoch: {step}")
+        
         loss = 0
+        
         for dataset in train_loader.keys():
-            S = train_loader[dataset][0]
+            S = train_loader[dataset]
             initial_features = train_features[dataset]
-            for i in range(len(train_loader[dataset])):
-                print(i)
-                adj_tensor = train_loader[dataset][i]
-                adj = coo_matrix(adj_tensor.numpy())
-                adj_norm = preprocess_graph(adj)
-                pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
-                norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
+            
+            # for i in range(len(train_loader[dataset])):
+            adj_tensor = train_loader[dataset]
+            adj = coo_matrix(adj_tensor.numpy())
+            adj_norm = preprocess_graph(adj)
+            pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
+            norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
-                adj_label = coo_matrix(S.numpy())
-                adj_label = sparse_to_tuple(adj_label)
+            adj_label = coo_matrix(S.numpy())
+            adj_label = sparse_to_tuple(adj_label)
 
-                adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
-                                                    torch.FloatTensor(adj_norm[1]),
-                                                    torch.Size(adj_norm[2])).to(device)
-                adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
-                                                    torch.FloatTensor(adj_label[1]),
-                                                    torch.Size(adj_label[2])).to(device)
+            adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                                                torch.FloatTensor(adj_norm[1]),
+                                                torch.Size(adj_norm[2])).to(device)
+            adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                                                torch.FloatTensor(adj_label[1]),
+                                                torch.Size(adj_label[2])).to(device)
 
-                initial_feature = initial_features[i].to(device)
+            initial_feature = initial_features.to(device)
 
-                weight_mask = adj_label.to_dense().view(-1) == 1
-                weight_tensor = torch.ones(weight_mask.size(0))
-                weight_tensor[weight_mask] = pos_weight
-                weight_tensor = weight_tensor.to(device)
-                z = GAE(initial_feature, adj_norm)
-                A_pred = torch.sigmoid(torch.matmul(z,z.t()))
-                loss += norm * F.binary_cross_entropy(A_pred.view(-1), adj_label.to_dense().view(-1),
-                                                           weight=weight_tensor)
+            weight_mask = adj_label.to_dense().view(-1) == 1
+            weight_tensor = torch.ones(weight_mask.size(0))
+            weight_tensor[weight_mask] = pos_weight
+            weight_tensor = weight_tensor.to(device)
+            z = GAE(initial_feature, adj_norm)
+            A_pred = torch.sigmoid(torch.matmul(z,z.t()))
+            loss += norm * F.binary_cross_entropy(A_pred.view(-1), adj_label.to_dense().view(-1), weight=weight_tensor)
+            # End for
         optimizer.zero_grad()
         loss = loss / no_samples
         loss.backward()
         optimizer.step()
+        
+        loop_obj.set_postfix_str(f"Loss: {loss:.4f}")
 
         keys = list(train_loader.keys())
-        S1 = train_loader[keys[0]][0]
-        S2 = train_loader[keys[1]][0]
+        S1 = train_loader[keys[0]]
+        S2 = train_loader[keys[1]]
         adj_S1 = coo_matrix(S1.numpy())
         adj_norm_1 = preprocess_graph(adj_S1)
         adj_norm_1 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_1[0].T),
-                                              torch.FloatTensor(adj_norm_1[1]),
-                                              torch.Size(adj_norm_1[2])).to(device)
+                                            torch.FloatTensor(adj_norm_1[1]),
+                                            torch.Size(adj_norm_1[2])).to(device)
         adj_S2 = coo_matrix(S2.numpy())
         adj_norm_2 = preprocess_graph(adj_S2)
         adj_norm_2 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_2[0].T),
-                                              torch.FloatTensor(adj_norm_2[1]),
-                                              torch.Size(adj_norm_2[2])).to(device)
+                                            torch.FloatTensor(adj_norm_2[1]),
+                                            torch.Size(adj_norm_2[2])).to(device)
         if (data == "ACM_DBLP"):
-            S1_feat = train_features["ACM"][0]
-            S2_feat = train_features["DBLP"][0]
+            S1_feat = train_features["ACM"]
+            S2_feat = train_features["DBLP"]
         elif (data == "Douban Online_Offline"):
-            S1_feat = train_features["Online"][0]
-            S2_feat = train_features["Offline"][0]
+            S1_feat = train_features["Online"]
+            S2_feat = train_features["Offline"]
 
         S1_emb = GAE(S1_feat.to(device), adj_norm_1).detach()
         S2_emb = GAE(S2_feat.to(device), adj_norm_2).detach()
@@ -132,6 +139,7 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
     print(best_hitAtTen)
     print("Hit@50: ", end="")
     print(best_hitAtFifty)
+    torch.cuda.empty_cache()
 
 
 def main(args):
@@ -142,12 +150,12 @@ def main(args):
         train_set = ["ACM", "DBLP"]
         input_dim = 17
         b = np.load('data/ACM-DBLP.npz')
-        train_features["ACM"] = [torch.from_numpy(b["x1"]).float()]
-        train_features["DBLP"] = [torch.from_numpy(b["x2"]).float()]
+        train_features["ACM"] = torch.from_numpy(b["x1"]).float()
+        train_features["DBLP"] = torch.from_numpy(b["x2"]).float()
         test_pairs = b['test_pairs'].astype(np.int32)
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
-        output_feature_size = 1024
+        output_feature_size = 3
         lr = 0.0001
         epoch = 50
     elif (data == "Douban Online_Offline"):
@@ -158,17 +166,24 @@ def main(args):
         input_dim = 538
         test_pairs = torch.tensor(np.array(test_pairs, dtype=int)) - 1
         test_pairs = test_pairs.numpy()
-        train_features["Online"] = [torch.from_numpy(f1).float()]
-        train_features["Offline"] = [torch.from_numpy(f2).float()]
+        train_features["Online"] = torch.from_numpy(f1).float()
+        train_features["Offline"] = torch.from_numpy(f2).float()
         NUM_HIDDEN_LAYERS = 6
         HIDDEN_DIM = [512,512,512,512,512,512,512]
         output_feature_size = 512
         lr = 0.0001
         epoch = 20
+        
     print("Loading training datasets")
     train_loader = {}
     for dataset in train_set:
-        train_loader[dataset] = [load_adj(dataset)]
+        train_loader[dataset] = load_adj(dataset)
+    
+    print("Train loader")
+    print(train_loader)
+    print("Train features")
+    print(train_features)
+    
     model = TGAE(NUM_HIDDEN_LAYERS,
                 input_dim,
                 HIDDEN_DIM,
