@@ -162,8 +162,8 @@ def main(args):
         test_pairs = b['test_pairs'].astype(np.int32)
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
-        output_feature_size = 3
-        lr = 0.0004
+        output_feature_size = 1024
+        lr = 2e-4
         epoch = 50
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
@@ -186,19 +186,21 @@ def main(args):
     for dataset in train_set:
         train_loader[dataset] = load_adj(dataset)
     
-    print("Train loader")
+    """ print("Train loader")
     print(train_loader)
     print("Train features")
-    print(train_features)
+    print(train_features) """
     
     model = TGAE(NUM_HIDDEN_LAYERS,
                 input_dim,
                 HIDDEN_DIM,
                 output_feature_size).to(device)
+    no_samples = len(train_set) # * (1 + 1)  # num datasets * num of samples by dataset 
+    
     print("Generating training features")
     print("Fitting model")
+    print(lr, epoch, output_feature_size, no_samples)
     
-    no_samples = len(train_set) # * (1 + 1)  # num datasets * num of samples by dataset 
     fit_TGAE_subgraph(data, no_samples, model, epoch, train_loader, train_features, device,
             lr,test_pairs)
 

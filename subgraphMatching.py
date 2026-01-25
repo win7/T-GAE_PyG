@@ -147,7 +147,7 @@ def main(args):
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
         output_feature_size = 1024
-        lr = 0.0001
+        lr = 0.0005 # before 0.0001
         epoch = 50
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
@@ -174,6 +174,8 @@ def main(args):
                 output_feature_size).to(device)
     print("Generating training features")
     print("Fitting model")
+    print(lr, epoch, output_feature_size)
+
     fit_TGAE_subgraph(data, len(train_set) * (1 + 1), model, epoch, train_loader, train_features, device,
             lr,test_pairs)
 
