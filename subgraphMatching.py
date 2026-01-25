@@ -16,7 +16,6 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
             S = train_loader[dataset][0]
             initial_features = train_features[dataset]
             for i in range(len(train_loader[dataset])):
-                print(i)
                 adj_tensor = train_loader[dataset][i]
                 adj = coo_matrix(adj_tensor.numpy())
                 adj_norm = preprocess_graph(adj)

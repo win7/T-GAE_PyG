@@ -4,6 +4,13 @@ from scipy.io import loadmat
 from model import *
 from utils import *
 
+np.random.seed(0)
+torch.manual_seed(0)
+torch.cuda.manual_seed(0)
+torch.cuda.manual_seed_all(0)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features, device, lr, test_pairs):
     best_hitAtOne = 0
     best_hitAtFive = 0
@@ -156,7 +163,7 @@ def main(args):
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
         output_feature_size = 3
-        lr = 0.0001
+        lr = 0.0004
         epoch = 50
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
@@ -190,7 +197,9 @@ def main(args):
                 output_feature_size).to(device)
     print("Generating training features")
     print("Fitting model")
-    fit_TGAE_subgraph(data, len(train_set) * (1 + 1), model, epoch, train_loader, train_features, device,
+    
+    no_samples = len(train_set) # * (1 + 1)  # num datasets * num of samples by dataset 
+    fit_TGAE_subgraph(data, no_samples, model, epoch, train_loader, train_features, device,
             lr,test_pairs)
 
 def parse_args():
