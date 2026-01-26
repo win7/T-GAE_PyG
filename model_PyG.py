@@ -14,7 +14,7 @@ from torch_geometric.nn import GINConv, global_mean_pool
 class TGAE_Encoder(torch.nn.Module):
 	def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
 		super().__init__()
-		hidden_layers = n_layers-2
+		hidden_layers = n_layers - 2
 		self.in_proj = torch.nn.Linear(input_dim, hidden_dim[0])
 		self.convs = torch.nn.ModuleList()
 		
@@ -27,35 +27,32 @@ class TGAE_Encoder(torch.nn.Module):
 				nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], hidden_dim[i+1])
 			)
-			self.convs.append(GINConv(mlp))
+			""" mlp = torch.nn.Sequential(
+                torch.nn.Linear(input_dim + hidden_dim[i], hidden_dim[i + 1]),
+                torch.nn.ReLU(),
+                torch.nn.Linear(hidden_dim[i + 1], hidden_dim[i + 1]),
+            ) """
+			self.convs.append(GINConv(mlp, eps=0.0, train_eps=False))
 		self.out_proj = torch.nn.Linear(sum(hidden_dim), output_dim)
 	
 	def forward(self, x, edge_index):
-		# x: [num_nodes, input_dim]
-		# edge_index: [2, num_edges]
-		x0 = x.clone()
-
-		# Primera proyección lineal
+		initial_x = x.clone()
 		x = self.in_proj(x)
-		states = [x]
+		hidden_states = [x]
 
-		# Aplicar cada capa GINConv
-		for conv in self.convs:
-			x= torch.cat([x0, x], dim=1)
-			x = conv(x, edge_index)
-			# x = F.relu(x)
-			states.append(x)
+		for layer in self.convs:
+			x_cat = torch.cat([initial_x, x], dim=1)
+			x = layer(x_cat, edge_index)
+			hidden_states.append(x)
 
-		# Concatenar todos los estados, luego proyectar
-		h = torch.cat(states, dim=1)
-		out = self.out_proj(h)
-		return out
+		x = torch.cat(hidden_states, dim=1)
+		x = self.out_proj(x)
+		return x
 
-# Modelo completo TGAE
 class TGAE(torch.nn.Module):
 	def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim):
 		super().__init__()
-		self.encoder = TGAE_Encoder(input_dim, hidden_dim, output_dim, num_hidden_layers+2)
+		self.encoder = TGAE_Encoder(input_dim, hidden_dim, output_dim, num_hidden_layers + 2)
 
 	def forward(self, x, edge_index):
 		z = self.encoder(x, edge_index)

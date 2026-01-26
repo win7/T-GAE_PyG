@@ -162,8 +162,8 @@ def main(args):
         test_pairs = b['test_pairs'].astype(np.int32)
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
-        output_feature_size = 1024
-        lr = 2e-4
+        output_feature_size = 128
+        lr = 1e-4
         epoch = 50
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
