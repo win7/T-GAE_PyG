@@ -146,6 +146,7 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
     print(best_hitAtTen)
     print("Hit@50: ", end="")
     print(best_hitAtFifty)
+    
     torch.cuda.empty_cache()
 
 
@@ -180,7 +181,7 @@ def main(args):
         output_feature_size = 512
         lr = 0.0001
         epoch = 20
-        
+
     print("Loading training datasets")
     train_loader = {}
     for dataset in train_set:
@@ -199,7 +200,7 @@ def main(args):
     
     print("Generating training features")
     print("Fitting model")
-    print(lr, epoch, output_feature_size, no_samples)
+    print(data, lr, epoch, input_dim, output_feature_size, no_samples)
     
     fit_TGAE_subgraph(data, no_samples, model, epoch, train_loader, train_features, device,
             lr,test_pairs)
