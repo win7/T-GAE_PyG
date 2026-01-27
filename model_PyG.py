@@ -1,16 +1,9 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import os
-import numpy as np
-import math
 
-import torch
-import torch.nn.functional as F
-from torch import nn
 from torch_geometric.nn import GINConv, global_mean_pool
 
-# Encoder usando GINConv de torch_geometric
+# Encoder using GINConv from torch_geometric
 class TGAE_Encoder(torch.nn.Module):
 	def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
 		super().__init__()

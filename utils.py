@@ -1,22 +1,37 @@
-import scipy
-from graphMatching import *
-from subgraphMatching import *
+import networkx as nx
+import numpy as np
+import random
+import scipy.sparse as sp
+import torch
+import os.path as osp
+
+from algorithm import *
+from netrd.distance import netsimile
+from scipy.io import loadmat
+from scipy.sparse import coo_matrix
 
 def load_adj(dataset):
     if (dataset == "celegans"):
-        S = torch.load("data/celegans.pt")
+        # S = torch.load("data/celegans.pt")
+        S = torch.load("data/celegans.pt", weights_only=False)
     elif(dataset == "arenas"):
-        S = torch.load("data/arenas.pt")
+        # S = torch.load("data/arenas.pt")
+        S = torch.load("data/arenas.pt", weights_only=False)
     elif (dataset == "douban"):
-        S = torch.load("data/douban.pt")
+        # S = torch.load("data/douban.pt")
+        S = torch.load("data/douban.pt", weights_only=False)
     elif(dataset == "Online"):
-        S = torch.load("data/online.pt")
+        # S = torch.load("data/online.pt")
+        S = torch.load("data/online.pt", weights_only=False)
     elif(dataset == "Offline"):
-        S = torch.load("data/offline.pt")
+        # S = torch.load("data/offline.pt")
+        S = torch.load("data/offline.pt", weights_only=False)
     elif (dataset == "ACM"):
-        S = torch.load("data/ACM.pt")
+        # S = torch.load("data/ACM.pt")
+        S = torch.load("data/ACM.pt", weights_only=False)
     elif (dataset == "DBLP"):
-        S = torch.load("data/DBLP.pt")
+        # S = torch.load("data/DBLP.pt")
+        S = torch.load("data/DBLP.pt", weights_only=False)
     else:
         filepath = "data/" + dataset + ".npz"
         loader = load_npz(filepath)
@@ -25,16 +40,16 @@ def load_adj(dataset):
         features = data.shape[1]
         values = data.data
         coo_data = data.tocoo()
-        indices = torch.LongTensor([coo_data.row, coo_data.col])
-        S = torch.sparse.FloatTensor(indices, torch.from_numpy(values).float(), [samples, features]).to_dense()
+        # indices = torch.LongTensor([coo_data.row, coo_data.col])
+        indices = torch.from_numpy(np.array([coo_data.row, coo_data.col]))
+        # S = torch.sparse.FloatTensor(indices, torch.from_numpy(values).float(), [samples, features]).to_dense()
+        S = torch.sparse_coo_tensor(indices, torch.from_numpy(values).float(), [samples, features]).to_dense()
         if (not torch.all(S.transpose(0, 1) == S)):
             S = torch.add(S, S.transpose(0, 1))
         S = S.int()
         ones = torch.ones_like(S)
         S = torch.where(S > 1, ones, S)
     return S
-
-
 
 def test_matching(TGAE, S_hat_samples, p_samples, S_hat_features, S_emb, device, algorithm, metric):
     if (metric == "accuracy"):
@@ -49,7 +64,10 @@ def test_matching(TGAE, S_hat_samples, p_samples, S_hat_features, S_emb, device,
         S_hat_cur = S_hat_samples[i]
         adj = coo_matrix(S_hat_cur.numpy())
         adj_norm = preprocess_graph(adj)
-        adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+        """ adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                                            torch.FloatTensor(adj_norm[1]),
+                                            torch.Size(adj_norm[2])).to(device) """
+        adj_norm = torch.sparse_coo_tensor(torch.LongTensor(adj_norm[0].T),
                                             torch.FloatTensor(adj_norm[1]),
                                             torch.Size(adj_norm[2])).to(device)
         initial_feature = S_hat_features[i].to(device)

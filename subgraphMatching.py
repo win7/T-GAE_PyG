@@ -1,7 +1,7 @@
-from graphMatching import *
-from networkx import read_edgelist
-from scipy.io import loadmat
+import argparse
+
 from model import *
+from torch.optim import Adam
 from utils import *
 
 def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features, device, lr, test_pairs):
@@ -25,10 +25,16 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
                 adj_label = coo_matrix(S.numpy())
                 adj_label = sparse_to_tuple(adj_label)
 
-                adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                """ adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                                                    torch.FloatTensor(adj_norm[1]),
+                                                    torch.Size(adj_norm[2])).to(device) """
+                adj_norm = torch.sparse_coo_tensor(torch.LongTensor(adj_norm[0].T),
                                                     torch.FloatTensor(adj_norm[1]),
                                                     torch.Size(adj_norm[2])).to(device)
-                adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                """ adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                                                    torch.FloatTensor(adj_label[1]),
+                                                    torch.Size(adj_label[2])).to(device) """
+                adj_label = torch.sparse_coo_tensor(torch.LongTensor(adj_label[0].T),
                                                     torch.FloatTensor(adj_label[1]),
                                                     torch.Size(adj_label[2])).to(device)
 
@@ -41,7 +47,7 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
                 z = GAE(initial_feature, adj_norm)
                 A_pred = torch.sigmoid(torch.matmul(z,z.t()))
                 loss += norm * F.binary_cross_entropy(A_pred.view(-1), adj_label.to_dense().view(-1),
-                                                           weight=weight_tensor)
+                                                        weight=weight_tensor)
         optimizer.zero_grad()
         loss = loss / no_samples
         loss.backward()
@@ -52,14 +58,20 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
         S2 = train_loader[keys[1]][0]
         adj_S1 = coo_matrix(S1.numpy())
         adj_norm_1 = preprocess_graph(adj_S1)
-        adj_norm_1 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_1[0].T),
-                                              torch.FloatTensor(adj_norm_1[1]),
-                                              torch.Size(adj_norm_1[2])).to(device)
+        """ adj_norm_1 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_1[0].T),
+                                            torch.FloatTensor(adj_norm_1[1]),
+                                            torch.Size(adj_norm_1[2])).to(device) """
+        adj_norm_1 = torch.sparse_coo_tensor(torch.LongTensor(adj_norm_1[0].T),
+                                            torch.FloatTensor(adj_norm_1[1]),
+                                            torch.Size(adj_norm_1[2])).to(device)
         adj_S2 = coo_matrix(S2.numpy())
         adj_norm_2 = preprocess_graph(adj_S2)
-        adj_norm_2 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_2[0].T),
-                                              torch.FloatTensor(adj_norm_2[1]),
-                                              torch.Size(adj_norm_2[2])).to(device)
+        """ adj_norm_2 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_2[0].T),
+                                            torch.FloatTensor(adj_norm_2[1]),
+                                            torch.Size(adj_norm_2[2])).to(device) """
+        adj_norm_2 = torch.sparse_coo_tensor(torch.LongTensor(adj_norm_2[0].T),
+                                            torch.FloatTensor(adj_norm_2[1]),
+                                            torch.Size(adj_norm_2[2])).to(device)
         if (data == "ACM_DBLP"):
             S1_feat = train_features["ACM"][0]
             S2_feat = train_features["DBLP"][0]
@@ -147,7 +159,7 @@ def main(args):
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
         output_feature_size = 1024
-        lr = 0.0005 # before 0.0001
+        lr = 0.0001
         epoch = 50
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
@@ -187,3 +199,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     main(args)
+    
+# Run
+# $ python subgraphMatching.py --dataset ACM_DBLP
+# $ python subgraphMatching.py --dataset "Douban Online_Offline"

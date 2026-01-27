@@ -1,22 +1,8 @@
-from algorithm import *
+import argparse
+
 from model import *
-import torch
-import numpy as np
-import scipy.sparse as sp
-from scipy.sparse import csr_matrix
-import pickle
-from netrd.distance import netsimile
-import networkx as nx
-import os.path as osp
-from scipy.sparse import coo_matrix
-from tqdm import tqdm
-import random
-import warnings
 from torch.optim import Adam
 from utils import *
-import argparse
-warnings.filterwarnings("ignore")
-
 
 def fit_TGAE(no_samples, TGAE, epoch, train_loader, train_features, device, lr, level_eval, dataset_eval, model_eval, algorithm, eval_interval):
 
@@ -28,7 +14,10 @@ def fit_TGAE(no_samples, TGAE, epoch, train_loader, train_features, device, lr, 
     S_eval = load_adj(dataset_eval)
     adj_S = coo_matrix(S_eval.numpy())
     adj_norm_S = preprocess_graph(adj_S)
-    adj_norm_S = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_S[0].T),
+    """ adj_norm_S = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_S[0].T),
+                                        torch.FloatTensor(adj_norm_S[1]),
+                                        torch.Size(adj_norm_S[2])).to(device) """
+    adj_norm_S = torch.sparse_coo_tensor(torch.LongTensor(adj_norm_S[0].T),
                                         torch.FloatTensor(adj_norm_S[1]),
                                         torch.Size(adj_norm_S[2])).to(device)
     S_feat = generate_features([S_eval])[0]
@@ -41,7 +30,6 @@ def fit_TGAE(no_samples, TGAE, epoch, train_loader, train_features, device, lr, 
             S = train_loader[dataset][0]
             initial_features = train_features[dataset]
             for i in range(len(train_loader[dataset])):
-                print(i)
                 adj_tensor = train_loader[dataset][i]
                 adj = coo_matrix(adj_tensor.numpy())
                 adj_norm = preprocess_graph(adj)
@@ -49,10 +37,16 @@ def fit_TGAE(no_samples, TGAE, epoch, train_loader, train_features, device, lr, 
                 norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
                 adj_label = coo_matrix(S.numpy())
                 adj_label = sparse_to_tuple(adj_label)
-                adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                """ adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                                                    torch.FloatTensor(adj_norm[1]),
+                                                    torch.Size(adj_norm[2])).to(device) """
+                adj_norm = torch.sparse_coo_tensor(torch.LongTensor(adj_norm[0].T),
                                                     torch.FloatTensor(adj_norm[1]),
                                                     torch.Size(adj_norm[2])).to(device)
-                adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                """ adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                                                    torch.FloatTensor(adj_label[1]),
+                                                    torch.Size(adj_label[2])).to(device) """
+                adj_label = torch.sparse_coo_tensor(torch.LongTensor(adj_label[0].T),
                                                     torch.FloatTensor(adj_label[1]),
                                                     torch.Size(adj_label[2])).to(device)
 
@@ -136,3 +130,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     main(args)
+    
+# Run
+# $ python graphMatching.py
+# $ python graphMatching.py --dataset celegans --model uniform --level 0 --algorithm greedy --eval_interval 1

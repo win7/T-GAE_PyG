@@ -1,7 +1,7 @@
-from graphMatching import *
-from networkx import read_edgelist
-from scipy.io import loadmat
+import argparse
+
 from model import *
+from torch.optim import Adam
 from utils import *
 
 np.random.seed(0)
@@ -38,10 +38,16 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
             adj_label = coo_matrix(S.numpy())
             adj_label = sparse_to_tuple(adj_label)
 
-            adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+            """ adj_norm = torch.sparse.FloatTensor(torch.LongTensor(adj_norm[0].T),
+                                                torch.FloatTensor(adj_norm[1]),
+                                                torch.Size(adj_norm[2])).to(device) """
+            adj_norm = torch.sparse_coo_tensor(torch.LongTensor(adj_norm[0].T),
                                                 torch.FloatTensor(adj_norm[1]),
                                                 torch.Size(adj_norm[2])).to(device)
-            adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+            """ adj_label = torch.sparse.FloatTensor(torch.LongTensor(adj_label[0].T),
+                                                torch.FloatTensor(adj_label[1]),
+                                                torch.Size(adj_label[2])).to(device) """
+            adj_label = torch.sparse_coo_tensor(torch.LongTensor(adj_label[0].T),
                                                 torch.FloatTensor(adj_label[1]),
                                                 torch.Size(adj_label[2])).to(device)
 
@@ -67,12 +73,18 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
         S2 = train_loader[keys[1]]
         adj_S1 = coo_matrix(S1.numpy())
         adj_norm_1 = preprocess_graph(adj_S1)
-        adj_norm_1 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_1[0].T),
+        """ adj_norm_1 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_1[0].T),
+                                            torch.FloatTensor(adj_norm_1[1]),
+                                            torch.Size(adj_norm_1[2])).to(device) """
+        adj_norm_1 = torch.sparse_coo_tensor(torch.LongTensor(adj_norm_1[0].T),
                                             torch.FloatTensor(adj_norm_1[1]),
                                             torch.Size(adj_norm_1[2])).to(device)
         adj_S2 = coo_matrix(S2.numpy())
         adj_norm_2 = preprocess_graph(adj_S2)
-        adj_norm_2 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_2[0].T),
+        """ adj_norm_2 = torch.sparse.FloatTensor(torch.LongTensor(adj_norm_2[0].T),
+                                            torch.FloatTensor(adj_norm_2[1]),
+                                            torch.Size(adj_norm_2[2])).to(device) """
+        adj_norm_2 = torch.sparse_coo_tensor(torch.LongTensor(adj_norm_2[0].T),
                                             torch.FloatTensor(adj_norm_2[1]),
                                             torch.Size(adj_norm_2[2])).to(device)
         if (data == "ACM_DBLP"):
@@ -213,3 +225,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     main(args)
+    
+# Run
+# $ python subgraphMatching_test.py --dataset ACM_DBLP
+# $ python subgraphMatching_test.py --dataset "Douban Online_Offline"
