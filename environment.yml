@@ -178,6 +178,7 @@ dependencies:
       - plotly==5.24.1
       - protobuf==5.27.3
       - pycparser==2.22
+      - pyg-lib==0.4.0+pt24cu124
       - pygmtools==0.5.3
       - pynndescent==0.5.13
       - pyparsing==3.1.2
@@ -201,10 +202,10 @@ dependencies:
       - tenacity==9.0.0
       - texttable==1.7.0
       - threadpoolctl==3.5.0
-      - torch-cluster==1.6.3+pt21cu121
+      - torch-cluster==1.6.3+pt24cu124
       - torch-geometric==2.7.0
-      - torch-scatter==2.1.2+pt21cu121
-      - torch-sparse==0.6.18+pt21cu121
+      - torch-scatter==2.1.2
+      - torch-sparse==0.6.18+pt24cu124
       - torch-spline-conv==1.2.2+pt21cu121
       - tqdm==4.66.5
       - tzdata==2024.1

@@ -164,7 +164,7 @@ def fit_TGAE_subgraph(data, no_samples, GAE, epoch, train_loader, train_features
 
 def main(args):
     data = args.dataset
-    device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
+    device = torch.device('cuda:1' if torch.cuda.is_available() else "cpu")
     train_features = {}
     if (data == "ACM_DBLP"):
         train_set = ["ACM", "DBLP"]
@@ -172,12 +172,18 @@ def main(args):
         b = np.load('data/ACM-DBLP.npz')
         train_features["ACM"] = torch.from_numpy(b["x1"]).float()
         train_features["DBLP"] = torch.from_numpy(b["x2"]).float()
+        
+        # Add permutation to test
+        """ x = torch.from_numpy(b["x2"]).float()
+        x = x[torch.randperm(x.size(0))]
+        train_features["DBLP"] = x """
+        
         test_pairs = b['test_pairs'].astype(np.int32)
         NUM_HIDDEN_LAYERS = 12
         HIDDEN_DIM = [1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024]
         output_feature_size = 128
         lr = 1e-4
-        epoch = 50
+        epoch = 100
     elif (data == "Douban Online_Offline"):
         a1, f1, a2, f2, test_pairs = load_douban()
         f1 = f1.A
