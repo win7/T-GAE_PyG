@@ -26,6 +26,7 @@ class TGAE_Encoder_GIN(torch.nn.Module):
                 torch.nn.Linear(hidden_dim[i + 1], hidden_dim[i + 1]),
             ) """
 			self.convs.append(GINConv(mlp, eps=0.0, train_eps=False))
+			# ResidualGINLayer(dims[i], dims[i + 1], alpha=alpha)
 		self.out_proj = torch.nn.Linear(sum(hidden_dim), output_dim)
 	
 	def forward(self, x, edge_index):
@@ -51,8 +52,9 @@ class TGAE_GIN(torch.nn.Module):
 		z = self.encoder(x, edge_index)
 		return z
 
+# Encoder using GINEConv from torch_geometric
 class TGAE_Encoder_GINE(nn.Module):
-	def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
+	def __init__(self, input_dim, hidden_dim, output_dim, n_layers, edge_dim):
 		super().__init__()
 
 		hidden_layers = n_layers - 2
@@ -68,7 +70,12 @@ class TGAE_Encoder_GINE(nn.Module):
 				nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], hidden_dim[i+1])
 			)
-			self.convs.append(GINEConv(mlp, edge_dim=1)) # Change edge_attribute
+			""" mlp = torch.nn.Sequential(
+                torch.nn.Linear(input_dim + hidden_dim[i], hidden_dim[i + 1]),
+                torch.nn.ReLU(),
+                torch.nn.Linear(hidden_dim[i + 1], hidden_dim[i + 1]),
+            ) """
+			self.convs.append(GINEConv(mlp, eps=0.0, train_eps=False, edge_dim=edge_dim))
 		self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
 
 	def forward(self, x, edge_index, edge_attr):
@@ -86,11 +93,33 @@ class TGAE_Encoder_GINE(nn.Module):
 		return x
 
 class TGAE_GINE(nn.Module):
-	def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim):
+	def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim, edge_dim):
 		super().__init__()
 
-		self.encoder = TGAE_Encoder_GINE(input_dim, hidden_dim, output_dim, num_hidden_layers + 2)
+		self.encoder = TGAE_Encoder_GINE(input_dim, hidden_dim, output_dim, num_hidden_layers + 2, edge_dim)
 
 	def forward(self, x, edge_index, edge_attr):
 		z = self.encoder(x, edge_index, edge_attr)
 		return z
+
+""" class ResidualGINLayer(torch.nn.Module):
+    def __init__(self, in_dim, out_dim, alpha=0.2):
+        super().__init__()
+        self.alpha = alpha
+
+        mlp = torch.nn.Sequential(
+            torch.nn.Linear(in_dim, out_dim),
+            torch.nn.ReLU(),
+            torch.nn.Linear(out_dim, out_dim),
+        )
+
+        self.conv = GINConv(mlp, train_eps=False)
+
+        self.proj = None
+        if in_dim != out_dim:
+            self.proj = torch.nn.Linear(in_dim, out_dim)
+
+    def forward(self, x, edge_index):
+        identity = x if self.proj is None else self.proj(x)
+        out = self.conv(x, edge_index)
+        return identity + self.alpha * out """
