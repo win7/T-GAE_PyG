@@ -44,6 +44,12 @@ def check_dataset(df):
     count_positive = (df > 0).sum().sum()
     print("Count positive:\t", count_positive)
     
+    greater_1 = (df > 1).sum().sum()
+    print("Count greater than 1:\t", greater_1)
+    
+    less_1 = (df < -1).sum().sum()
+    print("Count less than -1:\t", less_1)
+    
 def log10_global(df_join_raw):
     df_join_raw_log = df_join_raw.copy()
     for column in df_join_raw.columns:
