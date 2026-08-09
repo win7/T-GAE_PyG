@@ -10,14 +10,14 @@ def get_subgroups_id(df_join_raw, groups):
     dict_groups_id = {}
     for group in groups:
         # get group
-        columns = list(df_join_raw.filter(like=group).columns)
-
+        columns = list(df_join_raw.filter(like=group+"_").columns)
         subgroups = [item.split("{}_".format(group))[1].split(".")[0] for item in columns]
         subgroups = np.unique(subgroups)
         dict_groups_id[group] = subgroups.tolist()
     return dict_groups_id
 
 def check_dataset(df):
+    df = df.round(4)
     print("Checking dataset") 
     
     # ds = df.isin([np.inf, -np.inf]) 
