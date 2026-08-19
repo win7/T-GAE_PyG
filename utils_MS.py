@@ -62,7 +62,7 @@ def log10_global(df_join_raw):
 def split_groups_subgroups(df_join_raw_log, groups_id, subgroups_id):
     dict_df_groups_subgroups = {}
     for group_id in groups_id:
-        df_aux = df_join_raw_log.filter(like=group_id)
+        df_aux = df_join_raw_log.filter(like=group_id+"_")
         dict_aux = {}
         
         for subgroup_id in subgroups_id[group_id]:
