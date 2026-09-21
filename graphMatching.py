@@ -103,7 +103,7 @@ def main(args):
         train_loader[dataset] = generate_purturbations(device, original_graph_loader[dataset],
                                                         perturbation_level = training_perturbation_level,
                                                         no_samples=no_training_samples_per_graph,
-                                                       method = probability_model)
+                                                        method = probability_model)
     model = TGAE(NUM_HIDDEN_LAYERS,
                7,
                HIDDEN_DIM,

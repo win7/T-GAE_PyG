@@ -8,16 +8,20 @@ class TGAE_Encoder_GIN(torch.nn.Module):
 	def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
 		super().__init__()
 		hidden_layers = n_layers - 2
+
+		# Input projection
 		self.in_proj = torch.nn.Linear(input_dim, hidden_dim[0])
+		
+		# Hidden GIN layers
 		self.convs = torch.nn.ModuleList()
 		
 		for i in range(hidden_layers):
 			mlp = nn.Sequential(
 				nn.Linear(input_dim + hidden_dim[i], 2 * hidden_dim[i+1]),
 				nn.LayerNorm(2 * hidden_dim[i+1]),
-				nn.LeakyReLU(0.1),
+				nn.LeakyReLU(0.1), # nn.Tanh(), # nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], 2 * hidden_dim[i+1]),
-				nn.LeakyReLU(0.1),
+				nn.LeakyReLU(0.1), # nn.Tanh(), # nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], hidden_dim[i+1])
 			)
 			""" mlp = torch.nn.Sequential(
@@ -27,6 +31,8 @@ class TGAE_Encoder_GIN(torch.nn.Module):
             ) """
 			self.convs.append(GINConv(mlp, eps=0.0, train_eps=False))
 			# ResidualGINLayer(dims[i], dims[i + 1], alpha=alpha)
+
+		# Output projection: concatenation of all hidden dims
 		self.out_proj = torch.nn.Linear(sum(hidden_dim), output_dim)
 	
 	def forward(self, x, edge_index):
@@ -58,16 +64,20 @@ class TGAE_Encoder_GINE(nn.Module):
 		super().__init__()
 
 		hidden_layers = n_layers - 2
+		
+		# Input projection
 		self.in_proj = nn.Linear(input_dim, hidden_dim[0])
+
+		# Hidden GIN layers
 		self.convs = nn.ModuleList()
 		
 		for i in range(hidden_layers):
 			mlp = nn.Sequential(
 				nn.Linear(input_dim + hidden_dim[i], 2 * hidden_dim[i+1]),
 				nn.LayerNorm(2 * hidden_dim[i+1]),
-				nn.LeakyReLU(0.1),
+				nn.LeakyReLU(0.1), # nn.Tanh(), # nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], 2 * hidden_dim[i+1]),
-				nn.LeakyReLU(0.1),
+				nn.LeakyReLU(0.1), # nn.Tanh(), # nn.LeakyReLU(0.1),
 				nn.Linear(2 * hidden_dim[i+1], hidden_dim[i+1])
 			)
 			""" mlp = torch.nn.Sequential(
@@ -76,6 +86,8 @@ class TGAE_Encoder_GINE(nn.Module):
                 torch.nn.Linear(hidden_dim[i + 1], hidden_dim[i + 1]),
             ) """
 			self.convs.append(GINEConv(mlp, eps=0.0, train_eps=False, edge_dim=edge_dim))
+		
+		# Output projection: concatenation of all hidden dims
 		self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
 
 	def forward(self, x, edge_index, edge_attr):
