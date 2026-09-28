@@ -259,3 +259,15 @@ exp101
 ---
 exp102
     -  "Cora1-Cora2"
+---
+exp103
+    -  "flickr-lastfm"
+---
+exp104
+    -  "douban"
+---
+exp105
+    -  "flickr-myspace"
+---
+exp106
+    -  "ACM-DBLP"
