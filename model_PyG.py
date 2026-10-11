@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch_geometric.nn import MessagePassing
-from torch_geometric.nn import GINConv, GINEConv, global_mean_pool
+from torch_geometric.nn import GINConv, GINEConv, GCNConv, GATv2Conv, global_mean_pool
 
 # Encoder using GINConv from torch_geometric
 class TGAE_Encoder_GIN(torch.nn.Module):
@@ -116,9 +116,154 @@ class TGAE_GINE(nn.Module):
 		z = self.encoder(x, edge_index, edge_attr)
 		return z
 
-# Encoder using OriginalConv (GINConv in original paper) from torch_geometric
-class OriginalConv(MessagePassing):
-    """Replica exacta de la GINConv original: ReLU(Linear(X + A_norm @ X))"""
+# ---------------------------------------------------------------------------
+# Encoder using GCNConv from torch_geometric
+# ---------------------------------------------------------------------------
+class TGAE_Encoder_GCN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
+        super().__init__()
+        hidden_layers = n_layers - 2
+
+        self.in_proj = nn.Linear(input_dim, hidden_dim[0])
+
+        # GCNConv aplica D^-1/2 (A+I) D^-1/2 internamente (normalize=True por defecto)
+        self.convs = nn.ModuleList()
+        for i in range(hidden_layers):
+            self.convs.append(
+                GCNConv(input_dim + hidden_dim[i], hidden_dim[i + 1],
+                        add_self_loops=True, normalize=True)
+            )
+
+        self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
+
+    def forward(self, x, edge_index, edge_weight=None):
+        initial_x = x.clone()
+        x = self.in_proj(x)
+        hidden_states = [x]
+
+        for layer in self.convs:
+            x_cat = torch.cat([initial_x, x], dim=1)
+            x = F.relu(layer(x_cat, edge_index, edge_weight))  # GCNConv no incluye activación
+            hidden_states.append(x)
+
+        x = torch.cat(hidden_states, dim=1)
+        x = self.out_proj(x)
+        return x
+
+
+class TGAE_GCN(nn.Module):
+    def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.encoder = TGAE_Encoder_GCN(input_dim, hidden_dim, output_dim, num_hidden_layers + 2)
+
+    def forward(self, x, edge_index, edge_weight=None):
+        return self.encoder(x, edge_index, edge_weight)
+
+
+# ---------------------------------------------------------------------------
+# Encoder using GATv2Conv from torch_geometric
+# ---------------------------------------------------------------------------
+class TGAE_Encoder_GATv2(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, n_layers, heads=4):
+        super().__init__()
+        hidden_layers = n_layers - 2
+
+        # Con concat=True la salida de cada capa es heads * out_channels,
+        # por lo que hidden_dim[i+1] debe ser divisible por heads.
+        for i in range(hidden_layers):
+            assert hidden_dim[i + 1] % heads == 0, (
+                f"hidden_dim[{i + 1}]={hidden_dim[i + 1]} debe ser divisible por heads={heads}"
+            )
+
+        self.in_proj = nn.Linear(input_dim, hidden_dim[0])
+
+        self.convs = nn.ModuleList()
+        for i in range(hidden_layers):
+            self.convs.append(
+                GATv2Conv(input_dim + hidden_dim[i], hidden_dim[i + 1] // heads,
+                          heads=heads, concat=True, add_self_loops=True)
+            )
+
+        self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
+
+    def forward(self, x, edge_index):
+        initial_x = x.clone()
+        x = self.in_proj(x)
+        hidden_states = [x]
+
+        for layer in self.convs:
+            x_cat = torch.cat([initial_x, x], dim=1)
+            x = F.elu(layer(x_cat, edge_index))  # GATv2Conv no incluye activación
+            hidden_states.append(x)
+
+        x = torch.cat(hidden_states, dim=1)
+        x = self.out_proj(x)
+        return x
+
+
+class TGAE_GATv2(nn.Module):
+    def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim, heads=4):
+        super().__init__()
+        self.encoder = TGAE_Encoder_GATv2(input_dim, hidden_dim, output_dim,
+                                          num_hidden_layers + 2, heads=heads)
+
+    def forward(self, x, edge_index):
+        return self.encoder(x, edge_index)
+
+# ---------------------------------------------------------------------------
+# Encoder using GATv2Conv with edge attributes (análogo a GINE)
+# ---------------------------------------------------------------------------
+class TGAE_Encoder_GATv2E(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, n_layers, edge_dim, heads=4):
+        super().__init__()
+        hidden_layers = n_layers - 2
+
+        # Con concat=True la salida de cada capa es heads * out_channels,
+        # por lo que hidden_dim[i+1] debe ser divisible por heads.
+        for i in range(hidden_layers):
+            assert hidden_dim[i + 1] % heads == 0, (
+                f"hidden_dim[{i + 1}]={hidden_dim[i + 1]} debe ser divisible por heads={heads}"
+            )
+
+        self.in_proj = nn.Linear(input_dim, hidden_dim[0])
+
+        self.convs = nn.ModuleList()
+        for i in range(hidden_layers):
+            self.convs.append(
+                GATv2Conv(input_dim + hidden_dim[i], hidden_dim[i + 1] // heads,
+                          heads=heads, concat=True, edge_dim=edge_dim,
+                          add_self_loops=True, fill_value="mean")
+            )
+
+        self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
+
+    def forward(self, x, edge_index, edge_attr):
+        initial_x = x.clone()
+        x = self.in_proj(x)
+        hidden_states = [x]
+
+        for layer in self.convs:
+            x_cat = torch.cat([initial_x, x], dim=1)
+            x = F.elu(layer(x_cat, edge_index, edge_attr))
+            hidden_states.append(x)
+
+        x = torch.cat(hidden_states, dim=1)
+        x = self.out_proj(x)
+        return x
+
+
+class TGAE_GATv2E(nn.Module):
+    def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim, edge_dim, heads=4):
+        super().__init__()
+        self.encoder = TGAE_Encoder_GATv2E(input_dim, hidden_dim, output_dim,
+                                           num_hidden_layers + 2, edge_dim, heads=heads)
+
+    def forward(self, x, edge_index, edge_attr):
+        return self.encoder(x, edge_index, edge_attr)
+
+# Encoder using GCNResConv (GINConv in GCNRes paper) from torch_geometric
+class GCNResConv(MessagePassing):
+    """Replica exacta de la GINConv GCNRes: ReLU(Linear(X + A_norm @ X))"""
     def __init__(self, input_dim, output_dim):
         super().__init__(aggr="add")
         self.linear = nn.Linear(input_dim, output_dim)
@@ -131,14 +276,14 @@ class OriginalConv(MessagePassing):
     def message(self, x_j, edge_weight):
         return edge_weight.view(-1, 1) * x_j
 
-class TGAE_Encoder_Original(nn.Module):
+class TGAE_Encoder_GCNRes(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, n_layers):
         super().__init__()
         hidden_layers = n_layers - 2
         self.in_proj = nn.Linear(input_dim, hidden_dim[0])
         self.convs = nn.ModuleList()
         for i in range(hidden_layers):
-            self.convs.append(OriginalConv(input_dim + hidden_dim[i], hidden_dim[i + 1]))
+            self.convs.append(GCNResConv(input_dim + hidden_dim[i], hidden_dim[i + 1]))
         self.out_proj = nn.Linear(sum(hidden_dim), output_dim)
 
     def forward(self, x, edge_index, edge_weight):
@@ -153,10 +298,10 @@ class TGAE_Encoder_Original(nn.Module):
         x = self.out_proj(x)
         return x
 
-class TGAE_Original(nn.Module):
+class TGAE_GCNRes(nn.Module):
     def __init__(self, num_hidden_layers, input_dim, hidden_dim, output_dim):
         super().__init__()
-        self.encoder = TGAE_Encoder_Original(input_dim, hidden_dim, output_dim, num_hidden_layers + 2)
+        self.encoder = TGAE_Encoder_GCNRes(input_dim, hidden_dim, output_dim, num_hidden_layers + 2)
 
     def forward(self, x, edge_index, edge_weight):
         return self.encoder(x, edge_index, edge_weight)
