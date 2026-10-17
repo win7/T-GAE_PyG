@@ -278,3 +278,58 @@ exp107
 exp108
     -  "douban"
     - New code (refactor)
+exp110
+    - "Vanessa_september_2br_10ar_format"
+    - Original code
+    - 2
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 40
+    - 3
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+    - 4
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+    - 5
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+    - 6
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
+    - 7
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
+    - 8
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
+    - 9 (reply 2)
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 40
+    - 10
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
+exp111
+    - "Vanessa_september_2br_10ar_format"
+    - New code (refactor based on cla)

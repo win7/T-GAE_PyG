@@ -61,7 +61,7 @@ def _gin_mlp(in_dim, out_dim):
 
 class TGAE_Encoder(nn.Module):
     def __init__(self, conv_type, input_dim, hidden_dim, output_dim,
-                 num_hidden_layers, edge_dim=None, heads=4):
+                num_hidden_layers, edge_dim=None, heads=4):
         super().__init__()
         if conv_type not in CONV_TYPES:
             raise ValueError(f"conv_type debe ser uno de {CONV_TYPES}, recibido '{conv_type}'")
@@ -96,9 +96,9 @@ class TGAE_Encoder(nn.Module):
             return GCNResConv(in_dim, out_dim)
         if conv_type == "gatv2":
             return GATv2Conv(in_dim, out_dim // heads, heads=heads, concat=True,
-                             add_self_loops=True)
+                            add_self_loops=True)
         return GATv2Conv(in_dim, out_dim // heads, heads=heads, concat=True,
-                         edge_dim=edge_dim, add_self_loops=True, fill_value="mean")
+                        edge_dim=edge_dim, add_self_loops=True, fill_value="mean")
 
     def _act(self, h):
         if self.conv_type == "gcn":
@@ -110,8 +110,9 @@ class TGAE_Encoder(nn.Module):
 
     def forward(self, x, edge_index, *, edge_weight=None, edge_attr=None):
         if self.conv_type == "gcnres" and edge_weight is None:
+            print("No has edge_weight")
             edge_index, edge_weight = gcn_norm(edge_index, num_nodes=x.size(0),
-                                               add_self_loops=True)
+                                            add_self_loops=True)
         initial_x = x                 # no hay operaciones in-place: clone() no es necesario
         h = self.in_proj(x)
         hidden_states = [h]

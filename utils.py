@@ -375,6 +375,7 @@ def info_data(data, include_vectors=False):
 		print("{}".format(data.edge_index))
 		print("{}".format(data.x))
 		print("{}".format(data.edge_attr))
+		print("{}".format(data.edge_weight))
 
 def compute_num_neg_samples(edge_index, num_nodes, ratio):
 	E = edge_index.size(1)
@@ -407,6 +408,12 @@ class EarlyStopping:
 					self.stop_training = True
 					if self.verbose:
 						print("Stopping early as no improvement has been observed.")
+def set_seed(seed):
+	random.seed(seed)
+	np.random.seed(seed)
+	torch.manual_seed(seed)
+	torch.cuda.manual_seed_all(seed)
+
 #---
 # Create data (PyG)
 #---
@@ -573,8 +580,8 @@ def apply_edge_normalization(data, mean, std):
 	return data
 
 def normalize_node_edge_features(data1, data2, with_mean1, with_mean2):
-	node_scaler = StandardScaler(with_mean=with_mean1)
-	edge_scaler = StandardScaler(with_mean=with_mean2)
+	node_scaler = StandardScaler(with_mean=with_mean1) # with_mean=False to avoid breaking the sparsity structure of the data.
+	edge_scaler = StandardScaler(with_mean=with_mean2) # with_mean=False to avoid breaking the sparsity structure of the data.
 
 	# -------------------------
 	# Node features
