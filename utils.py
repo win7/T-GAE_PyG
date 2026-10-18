@@ -697,9 +697,9 @@ import torch
 
 
 def hits_ks_scores(simiarity: torch.Tensor,
-				   test_pairs: torch.Tensor,
-				   ks: Union[list[int], tuple[int, ...]] = (1, 10, 30, 50),
-				   mode: str = 'mean') -> dict[int, float]:
+				test_pairs: torch.Tensor,
+				ks: Union[list[int], tuple[int, ...]] = (1, 10, 30, 50),
+				mode: str = 'mean') -> dict[int, float]:
 	r"""Hits@K scores of pairwise alignment results.
 
 	Parameters

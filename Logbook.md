@@ -330,6 +330,13 @@ exp110
         "weight_decay": 0.0005,
         "patience": 20
         AdamW
+    Experimentos para reproducibilidad
+    - 11, 12, 13, 14, 15
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
 exp111
     - "Vanessa_september_2br_10ar_format"
     - New code (refactor based on cla)
