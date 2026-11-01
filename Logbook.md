@@ -251,28 +251,28 @@ exp38
         ] Memory problem
 
 ---
-exp100
+exp100 (for paper)
     -  "ACM_DBLP"
 ---
-exp101
+exp101 (for paper)
     -  "Douban_Online_Offline"
 ---
-exp102
+exp102 (for paper)
     -  "Cora1-Cora2"
 ---
-exp103
+exp103 (for paper) (PlanetAlign)
     -  "flickr-lastfm"
 ---
-exp104
+exp104 (for paper) (PlanetAlign)
     -  "douban"
 ---
-exp105
+exp105 (for paper) (PlanetAlign)
     -  "flickr-myspace"
 ---
-exp106
+exp106 (for paper) (PlanetAlign)
     -  "ACM-DBLP"
 ---
-exp107
+exp107 (for paper) (PlanetAlign)
     -  "cora"
 ---
 exp108
@@ -281,57 +281,57 @@ exp108
 exp110
     - "Vanessa_september_2br_10ar_format"
     - Original code
-    - 2
+    - iter 2
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 40
-    - 3
+    - iter 3
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
-    - 4
+    - iter 4
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
-    - 5
+    - iter 5
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
-    - 6
-        "dimension": 128
-        "lr": 0.0001,
-        "weight_decay": 0.0005,
-        "patience": 20
-        AdamW
-    - 7
+    - iter 6
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
         AdamW
-    - 8
+    - iter 7
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
         AdamW
-    - 9 (reply 2)
+    - iter 8
+        "dimension": 128
+        "lr": 0.0001,
+        "weight_decay": 0.0005,
+        "patience": 20
+        AdamW
+    - iter 9 (reply 2)
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 40
-    - 10
+    - iter 10
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
         "patience": 20
         AdamW
     Experimentos para reproducibilidad
-    - 11, 12, 13, 14, 15
+    - iters 11, 12, 13, 14, 15
         "dimension": 128
         "lr": 0.0001,
         "weight_decay": 0.0005,
@@ -342,8 +342,24 @@ exp111
     - New code (refactor based on cla)
 exp112, exp113, exp114, exp115, exp116
     - "Vanessa_september_2br_10ar_format"
-    - Original code (use in experiments for other dataset)
+    - Original code (use in experiments for other dataset (Cora, Douban and ACM-DBLP))
 exp117
     - "Vanessa_september_2br_10ar_format"
     - Original code (use in experiments for other dataset)
-    - New node features: 
+    - New node features: [2, 4, 5]
+exp118 
+    - "Vanessa_september_2br_10ar_format"
+    - Original code (use in experiments for other dataset)
+    - Correlation matrix using correlation_ledoitwolf_global(percentil=85)
+    - Common nodes: iter 1, iter 2, iter 3, iter 4, iter 5
+
+exp119
+    - "Vanessa_september_2br_10ar_format"
+    - Original code (use in experiments for other dataset)
+    - Common nodes: iter 1, iter 2, iter 3, iter 4, iter 5
+
+exp119 (NO yet)
+    - "Vanessa_september_2br_10ar_format"
+    - Original code (use in experiments for other dataset)
+    - Correlation matrix using correlation_ledoitwolf_global(percentil=85)
+    - NO: plus positional encoding: T.AddLaplacianEigenvectorPE(k=3, attr_name=None, is_undirected=True

@@ -787,3 +787,52 @@ def pairwise_cosine_similarity(x, y, p=2):
 	normalized_x = F.normalize(x, p=p, dim=1)
 	normalized_y = F.normalize(y, p=p, dim=1)
 	return normalized_x @ normalized_y.T
+
+#---
+# Similary analysis (Hungarian)
+#---
+import math
+import torch
+from scipy.optimize import linear_sum_assignment
+
+def sinkhorn_similarity(sim, tau=0.05, n_iter=20):
+	"""Log-domain Sinkhorn normalization of a similarity matrix [N1, N2] (soft assignment, in log space)."""
+	n1, n2 = sim.shape
+	log_p = sim / tau
+	for _ in range(n_iter):
+		log_p = log_p - torch.logsumexp(log_p, dim=1, keepdim=True) - math.log(n1)   # rows sum to 1/N1
+		log_p = log_p - torch.logsumexp(log_p, dim=0, keepdim=True) - math.log(n2)   # columns sum to 1/N2
+	return log_p        # higher = more likely; usable directly with hits_ks_scores / mrr_score
+
+def hungarian_matching(sim, min_sim=None):
+	"""One-to-one assignment maximizing total similarity (rectangular matrices are fine)."""
+	s = sim.cpu().numpy()
+	r, c = linear_sum_assignment(-s)
+	if min_sim is not None:                       # reject weak matches (partial overlap)
+		keep = s[r, c] >= min_sim
+		r, c = r[keep], c[keep]
+	return r, c
+
+def _mean_topk(a, b, k, chunk=2048):
+	"""Para cada fila de a: media de las k mayores similitudes coseno con las filas de b."""
+	out = []
+	for i in range(0, a.size(0), chunk):
+		out.append((a[i:i + chunk] @ b.T).topk(k, dim=1).values.mean(dim=1))
+	return torch.cat(out)
+
+@torch.no_grad()
+def similarity_matrix(z1, z2, retrieval="cosine", csls_k=None):
+	"""Full similarity matrix [N1, N2] (higher = more similar), as PlanetAlign expects."""
+	if retrieval == "cosine":
+		a, b = F.normalize(z1, p=2.0, dim=1), F.normalize(z2, p=2.0, dim=1)
+		sim = a @ b.T
+		if csls_k:
+			r_s = _mean_topk(a, b, csls_k)
+			r_t = _mean_topk(b, a, csls_k)
+			sim = 2 * sim - r_s.unsqueeze(1) - r_t.unsqueeze(0)
+		return sim
+	if retrieval == "l2":
+		if csls_k:
+			raise ValueError("csls_k is only supported with retrieval='cosine'")
+		return -torch.cdist(z1, z2)  # distances -> similarities
+	raise ValueError("retrieval must be 'cosine' or 'l2'")
