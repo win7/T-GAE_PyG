@@ -358,8 +358,9 @@ exp119
     - Original code (use in experiments for other dataset)
     - Common nodes: iter 1, iter 2, iter 3, iter 4, iter 5
 
-exp119 (NO yet)
+exp120 (for paper)
     - "Vanessa_september_2br_10ar_format"
-    - Original code (use in experiments for other dataset)
-    - Correlation matrix using correlation_ledoitwolf_global(percentil=85)
-    - NO: plus positional encoding: T.AddLaplacianEigenvectorPE(k=3, attr_name=None, is_undirected=True
+    - Original code (use in experiments for other dataset) plus learning stoppind, Adam
+    - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
+    - Objetive: comparison
+    - 
