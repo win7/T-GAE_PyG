@@ -1,150 +1,150 @@
-exp8:
+exp8: Remove
     - ["Pablo_2br_14ar_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp9:
+exp9: Remove
     - ["Pablo_2br_14ar_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 95 percentil
     - Mz +-
 
-exp10:
+exp10: Remove
     - ["Pablo_2br_3ar_pn_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 95 percentil
     - Mz +-
     - Loss: nan
-exp11:
+exp11: Remove
     - ["Pablo_2br_6ar_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 95 percentil (90 no por vram)
     - Mz +-
-exp12:
+exp12: Remove
     - ["Pablo_2br_3ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp13:
+exp13: Remove
     - ["Pablo_2br_3ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp14:
+exp14: Remove
     - ["Pablo_2br_3ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 ---
-exp15:
+exp15: Remove
     - ["Pablo_2br_4ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp16:
+exp16: Remove
     - ["Pablo_2br_4ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp17:
+exp17: Remove
     - ["Pablo_2br_4ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 
-exp18:
+exp18: Remove
     - ["Pablo_2br_8ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp19:
+exp19: Remove
     - ["Pablo_2br_8ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp20:
+exp20: Remove
     - ["Pablo_2br_8ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 
-exp21:
+exp21: Remove
     - ["Pablo_2br_16ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp22:
+exp22: Remove
     - ["Pablo_2br_16ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp23:
+exp23: Remove
     - ["Pablo_2br_16ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 
-exp24:
+exp24: Remove
     - ["Pablo_2br_mid_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp25:
+exp25: Remove
     - ["Pablo_2br_mid_ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp26
+exp26: Remove
     - ["Pablo_2br_mid_ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 
-exp27:
+exp27: Remove
     - ["Pablo_2br_mid_sk_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp28:
+exp28: Remove
     - ["Pablo_2br_mid_sk_ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp29
+exp29: Remove
     - ["Pablo_2br_mid_sk_ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 ---
-exp30:
+exp30: Remove
     - ["Pablo_new_2br_mid_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp31:
+exp31: Remove
     - ["Pablo_new_2br_mid_ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
@@ -157,26 +157,26 @@ exp32
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 ---
-exp33:
+exp33: Remove
     - ["Pablo_new_2br_N_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp34:
+exp34: Remove
     - ["Pablo_new_2br_N_ar_p_43_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
-exp35
+exp35: Remove
     - ["Pablo_new_2br_N_ar_p_44_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
     - build_graph_weight_global_directed_new, 90 percentil
     - Mz +
 ---
-exp36
+exp36: Remove
     - ["Pablo_new_N_br_M_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global
@@ -184,14 +184,14 @@ exp36
     - Mz +
 
 ---
-exp37
+exp37: Remove
     - ["Pablo_new_N_br_M_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_global(exp, dict_groups_subgroups_t)
     - build_graph_weight_global_directed, "threshold_corr": 0.9,
     - Mz +
 ---
-exp38
+exp38: Remove
     - ["Pablo_new_N_br_M_ar_p_42_format", ["AR"]]
     - transpose_global
     - correlation_ledoitwolf_global(exp, dict_groups_subgroups_t)
@@ -352,15 +352,19 @@ exp118
     - Original code (use in experiments for other dataset)
     - Correlation matrix using correlation_ledoitwolf_global(percentil=85)
     - Common nodes: iter 1, iter 2, iter 3, iter 4, iter 5
-
 exp119
     - "Vanessa_september_2br_10ar_format"
     - Original code (use in experiments for other dataset)
     - Common nodes: iter 1, iter 2, iter 3, iter 4, iter 5
-
 exp120 (for paper)
     - "Vanessa_september_2br_10ar_format"
     - Original code (use in experiments for other dataset) plus learning stoppind, Adam
     - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
     - Objetive: comparison
-    - 
+    - Seed(42)
+exp120 (for paper)
+    - "Vanessa_september_2br_10ar_format"
+    - Original code (use in experiments for other dataset) plus learning stoppind, Adam
+    - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
+    - Objetive: comparison
+    - Seed(42)
