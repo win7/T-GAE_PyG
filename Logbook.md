@@ -362,7 +362,7 @@ exp120 (for paper)
     - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
     - Objetive: comparison
     - Seed(42)
-exp120 (for paper)
+exp121 (for paper)
     - "Vanessa_september_2br_10ar_format"
     - Original code (use in experiments for other dataset) plus learning stoppind, Adam
     - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
