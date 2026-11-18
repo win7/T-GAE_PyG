@@ -362,9 +362,9 @@ exp120 (for paper)
     - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
     - Objetive: comparison
     - Seed(42)
-exp121 (for paper)
+exp121 (for paper, slect to include to paper)
     - "Vanessa_september_2br_10ar_format"
     - Original code (use in experiments for other dataset) plus learning stoppind, Adam
-    - Params: dim=128, hidden=12, with iters = 1, 2, ... 10
+    - Params: dim=128, hidden=12, with iters = 1, 2, 3, 4, 5 (con seed solo al crear el modelo), 6, 7, 8, 9, 10 (con seed al crear y antes de entrenar el modelo), iters =, 16, 17, 18, 19, 20 (con seed solo en crear el modelo, sampling en CPU para reducir aletoriedad. Este resultado se usa para paper).
     - Objetive: comparison
     - Seed(42)

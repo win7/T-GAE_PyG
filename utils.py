@@ -4,6 +4,7 @@ import random
 import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
+import torch_geometric
 import os.path as osp
 
 from algorithm import *
@@ -12,7 +13,6 @@ from torch_geometric.data import InMemoryDataset, Data
 from scipy.io import loadmat
 from scipy.sparse import coo_matrix
 from sklearn.preprocessing import StandardScaler
-
 
 def load_adj(dataset):
 	if (dataset == "celegans"):
@@ -408,17 +408,30 @@ class EarlyStopping:
 					self.stop_training = True
 					if self.verbose:
 						print("Stopping early as no improvement has been observed.")
-def set_seed(seed):
+def set_seed_(seed):
 	random.seed(seed)
 	np.random.seed(seed)
 
 	torch.manual_seed(seed)
 	torch.cuda.manual_seed(seed)
 	torch.cuda.manual_seed_all(seed)
+	torch_geometric.seed_everything(seed)
 
 	torch.backends.cudnn.deterministic = True
 	torch.backends.cudnn.benchmark = False
+	torch.use_deterministic_algorithms(False)  # Mantener en False para máxima velocidad 
 
+def set_seed(seed=42):
+    # Set random seeds for Python, NumPy, PyTorch, and PyG (CPU & GPU)
+    torch_geometric.seed_everything(seed)
+    
+    # Ensure deterministic behavior for cuDNN backend operations
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # Allow non-deterministic atomic operations (e.g., scatter_add in GNNs) for maximum training speed
+    torch.use_deterministic_algorithms(False)
+    
 #---
 # Create data (PyG)
 #---
